@@ -1,6 +1,24 @@
+const { spawn } = require('child_process');
+
 const spawnChildProcess = async (args) => {
-    // Write your code here
+    const child = spawn('node', ['script.js', ...args], {
+        stdio: ['pipe', 'pipe', 'inherit']
+    });
+
+    // Set up communication between parent and child processes
+    process.stdin.pipe(child.stdin);
+    child.stdout.pipe(process.stdout);
+
+    // Log any errors
+    child.on('error', (err) => {
+        console.error('Child process error:', err);
+    });
+
+    // Log when the child process exits
+    child.on('exit', (code, signal) => {
+        console.log(`Child process exited with code ${code} and signal ${signal}`);
+    });
 };
 
-// Put your arguments in function call to test this functionality
-spawnChildProcess( /* [someArgument1, someArgument2, ...] */);
+// Example usage
+spawnChildProcess(['arg1', 'arg2', 'arg3']);
